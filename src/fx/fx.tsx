@@ -100,6 +100,7 @@ export function Fx({ effect, preset, params, place = 'under', radius, backdrop, 
     }
     // A heated glow or a one-shot draws only while it changes; everything else loops.
     const settles = trigger !== undefined || (hot !== undefined && def.id === 'glow' && !live.current.params.breathe && live.current.params.style !== 'aura')
+    if (def.still?.(live.current.params)) target.animate = false
     if (settles) { target.animate = false; Object.defineProperty(target, 'until', { get: () => Math.max(live.current.t0 + 2.6, live.current.heat.at + 4) }) }
     if (mask) { const c = paintCanvas(mask, box.w, box.h, box.s); target.source = { source: c, version: Date.now() } }
     if (typeof backdrop === 'function') {

@@ -26,6 +26,8 @@ export type EffectDef = {
   defaults: Params; presets: Record<string, Params>; knobs: Knob[]
   /** How far past the element the layer draws: (left, top, right, bottom) in points. */
   reach: (p: Params, rect: Rect) => V4
+  /** True when nothing moves with time for these params: the layer draws once, then only on change. */
+  still?: (p: Params) => boolean
   pack: (p: Params, f: Frame) => Packed | null
 }
 
@@ -250,7 +252,7 @@ const grain: EffectDef = {
   defaults: { amount: 0.05, fps: 0, feather: 0 },
   presets: { Static: {}, Film: { amount: 0.08, fps: 12 } },
   knobs: [n('amount', 'Amount', 0, 0.3, 0.005), n('fps', 'Rate', 0, 30, 1), n('feather', 'Feather', 0, 40, 1)],
-  reach: () => even(1),
+  reach: () => even(1), still: p => !num(p.fps),
   pack: (p, f) => { const i = blank(f); i.t[2] = 3; i.p0 = [num(p.amount), num(p.fps), num(p.feather), 0]; return { family: 'extras', inst: i, data: [] } },
 }
 
@@ -293,8 +295,8 @@ const MESH_POINTS: [number, number][] = [[0.12, 0.18], [0.86, 0.12], [0.5, 0.55]
 const inputs: [string, string][] = [['linear', 'Linear'], ['radial', 'Radial'], ['noise', 'Noise'], ['backdrop', 'Backdrop']]
 const inputCode = (v: Value) => ({ linear: 0, radial: 1, noise: 2, backdrop: 3, image: 4 } as Record<string, number>)[String(v)] ?? 0
 const fillCommon: Knob[] = [n('border', 'Border', 0, 24, 0.5), n('intensity', 'Intensity', 0, 1)]
-const fillDef = (id: string, name: string, variant: number, summary: string, defaults: Params, presets: Record<string, Params>, knobs: Knob[], set: (i: Inst, p: Params, f: Frame, data: Table) => void, reads?: 'backdrop'): EffectDef => ({
-  id, name, group: 'Fills', family: 'fill', source: 'crates/rune-fx/src/shaders/fill.wgsl', summary, reads, presets,
+const fillDef = (id: string, name: string, variant: number, summary: string, defaults: Params, presets: Record<string, Params>, knobs: Knob[], set: (i: Inst, p: Params, f: Frame, data: Table) => void, reads?: 'backdrop', still?: (p: Params) => boolean): EffectDef => ({
+  id, name, group: 'Fills', family: 'fill', source: 'crates/rune-fx/src/shaders/fill.wgsl', summary, reads, presets, still,
   defaults: { border: 0, intensity: 1, ...defaults }, knobs: [...knobs, ...fillCommon], reach: () => even(0),
   pack: (p, f) => {
     if (num(p.intensity) <= 0) return null
@@ -360,12 +362,12 @@ const halftone = fillDef('halftone', 'Halftone', 9, 'A print screen: dots on a r
   { input: 'radial', ink: 0x1b1b1f, base: 0xf1ece1, cell: 6, angle: 0.785, rampAngle: 0.6, scale: 90, speed: 0.2, bias: 0, contrast: 1 },
   { Print: {}, Backdrop: { input: 'backdrop', cell: 4 } },
   [ch('input', 'Input', inputs), c('ink', 'Ink'), c('base', 'Base'), n('cell', 'Dot pitch', 2, 32, 0.5), n('angle', 'Screen angle', -RAD, RAD), n('rampAngle', 'Ramp angle', -RAD, RAD), n('scale', 'Noise scale', 8, 400, 1), n('speed', 'Speed', 0, 2), n('bias', 'Bias', -1, 1), n('contrast', 'Contrast', 0.2, 4)],
-  (i, p) => { i.c0 = col(p.ink); i.c1 = col(p.base); i.p0 = [0, inputCode(p.input), Math.max(1, num(p.cell)), num(p.rampAngle)]; i.p1 = [Math.max(1, num(p.scale)), num(p.speed), num(p.bias), num(p.contrast)]; i.p2 = [num(p.angle), 0, 0, 0] })
+  (i, p) => { i.c0 = col(p.ink); i.c1 = col(p.base); i.p0 = [0, inputCode(p.input), Math.max(1, num(p.cell)), num(p.rampAngle)]; i.p1 = [Math.max(1, num(p.scale)), num(p.speed), num(p.bias), num(p.contrast)]; i.p2 = [num(p.angle), 0, 0, 0] }, undefined, p => p.input !== 'noise')
 const plastic = fillDef('plastic', 'Plastic', 10, 'A keycap under one soft light: the diffuse base keeps its colour, a GGX highlight widened by the size of the light, and a faint sky at grazing angles.',
   { color: 0xece8de, roughness: 0.15, dome: 0.35, bevel: 6, angle: -0.5 },
   { Glossy: {}, Matte: { color: 0x2e3036, roughness: 0.8 }, Dished: { color: 0xd8d2c4, roughness: 0.7, dome: -0.45 } },
   [c('color', 'Colour'), n('roughness', 'Roughness', 0.05, 1), n('dome', 'Dome', -1, 1), n('bevel', 'Bevel', 0, 48, 0.5), n('angle', 'Light angle', -RAD, RAD)],
-  (i, p) => { i.c0 = col(p.color); i.p0 = [Math.max(0, Math.min(1, num(p.roughness, 0.15))), num(p.dome), Math.max(0, num(p.bevel)), num(p.angle)] })
+  (i, p) => { i.c0 = col(p.color); i.p0 = [Math.max(0, Math.min(1, num(p.roughness, 0.15))), num(p.dome), Math.max(0, num(p.bevel)), num(p.angle)] }, undefined, () => true)
 
 // ---------------------------------------------------------------- weather and light (this site's own)
 const weatherDef = (id: string, name: string, variant: number, summary: string, defaults: Params, knobs: Knob[]): EffectDef => ({

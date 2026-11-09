@@ -2,6 +2,7 @@
 export * from './motion'
 export { default as settleSpring } from './motion'
 export { Fx, cover, type FxProps, type Paint } from './fx/fx'
+export { LazyFx } from './fx/lazy'
 export { effects, effect, paramsOf, CALM_T, type EffectDef, type Params, type Knob, type Occluder } from './fx/effects'
 export { fxEngine, type Target, type Layer, type Texture, type Backdrop } from './fx/engine'
 export * from './kit/controls'

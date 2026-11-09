@@ -64,6 +64,10 @@ import { Fx, Button, Switch, snappy } from 'runets'
   <Fx effect="glow" preset="Neon" hot={hot} />      {/* lights fast, cools slowly, never cuts off */}
 </div>
 
+<div className="cta">                              {/* LazyFx loads the engine after the page */}
+  <LazyFx effect="glow" preset="Soft" />
+</div>
+
 <div className="badge"><Fx effect="liquid-metal" preset="Gold" /> Accepted</div>
 <Fx effect="lens" backdrop="/photo.jpg" place="over" />
 <Fx effect="sparkles" preset="Burst" trigger={count} place="over" />   {/* fire a one-shot */}
