@@ -1,0 +1,32 @@
+/* runets default theme: the few base tokens kit.css derives everything else from. Replace any of them with
+   your own (a design system usually already has these), or keep these. Light and dark follow
+   prefers-color-scheme, or [data-theme="light" | "dark"] on any ancestor. */
+:root, [data-theme="light"] {
+  --background: oklch(98% 0.004 250); --foreground: oklch(22% 0.02 255); --muted-foreground: oklch(48% 0.02 255);
+  --primary: oklch(52% 0.18 255); --primary-foreground: oklch(98% 0.005 250);
+  --color-focus: oklch(55% 0.2 255); --color-error: oklch(55% 0.2 27); --color-success: oklch(55% 0.13 150);
+  --color-warning: oklch(64% 0.15 70); --color-info: oklch(58% 0.13 240);
+  --font-body: system-ui, -apple-system, "Segoe UI", sans-serif;
+  --text-xs: 0.8125rem; --text-sm: 0.875rem; --text-md: 1rem; --text-lg: 1.25rem;
+  --z-dropdown: 100; --z-modal: 400; --z-toast: 500;
+  /* Springs for CSS: a critically damped spring sampled as linear(), and the 0.15-bounce one. */
+  --ease-spring: linear(0, 0.029, 0.097, 0.186, 0.282, 0.376, 0.466, 0.547, 0.619, 0.682, 0.736, 0.782, 0.821, 0.854, 0.881, 0.903, 0.921, 0.936, 0.949, 0.959, 0.967, 0.973, 0.979, 0.983, 1);
+  --ease-spring-pop: linear(0, 0.048, 0.157, 0.292, 0.43, 0.556, 0.666, 0.757, 0.829, 0.884, 0.925, 0.955, 0.975, 0.989, 0.997, 1.003, 1.005, 1.006, 1.006, 1.006, 1.005, 1.004, 1.003, 1.002, 1);
+  --dur-instant: 100ms; --dur-snap: 250ms; --dur-settle: 300ms; --dur-reflow: 400ms; --dur-glide: 320ms; --dur-morph: 390ms; --dur-pop: 325ms; --dur-drift: 850ms;
+  --ease-kit-enter: cubic-bezier(.2, .8, .2, 1); --ease-kit-exit: cubic-bezier(.4, 0, 1, 1); --dur-kit-enter: 150ms; --dur-kit-exit: 110ms; --ease-in-out: cubic-bezier(.65, 0, .35, 1);
+  color-scheme: light;
+}
+[data-theme="dark"] {
+  --background: oklch(16% 0.01 250); --foreground: oklch(94% 0.006 250); --muted-foreground: oklch(70% 0.012 250);
+  --primary: oklch(72% 0.14 255); --primary-foreground: oklch(16% 0.01 250);
+  --color-focus: oklch(70% 0.16 255); --color-warning: oklch(83% 0.14 85); --color-info: oklch(74% 0.12 240);
+  color-scheme: dark;
+}
+@media (prefers-color-scheme: dark) {
+  :root:not([data-theme="light"]) {
+    --background: oklch(16% 0.01 250); --foreground: oklch(94% 0.006 250); --muted-foreground: oklch(70% 0.012 250);
+    --primary: oklch(72% 0.14 255); --primary-foreground: oklch(16% 0.01 250);
+    --color-focus: oklch(70% 0.16 255); --color-warning: oklch(83% 0.14 85); --color-info: oklch(74% 0.12 240);
+    color-scheme: dark;
+  }
+}
