@@ -1,4 +1,4 @@
-// Surface effects ported from rune-fx (MIT, Anomaly): distort.wgsl (heat haze, shockwave, liquid-glass
+// Surface effects adapted from rune-fx (MIT, Anomaly): distort.wgsl (heat haze, shockwave, liquid-glass
 // lens, CRT, chromatic split) and fill.wgsl (liquid metal, mesh gradient, dither, grain gradient,
 // fluted glass, metaballs, swirl, voronoi, waves, halftone, plastic). The backdrop is the image the
 // page hands the layer; its mip chain stands in for the original's dual-filter blur pyramid.

@@ -1,7 +1,7 @@
 {
   "name": "runets",
   "version": "0.1.0",
-  "description": "Components, springs and WebGL 2 shader effects for React: a TypeScript port of Rune.",
+  "description": "Components, springs and WebGL 2 shader effects for React, in TypeScript.",
   "license": "MIT",
   "author": "Ziyam Khan (https://ziyamkhan.com)",
   "repository": { "type": "git", "url": "git+https://github.com/ziyam-khan/runets.git" },

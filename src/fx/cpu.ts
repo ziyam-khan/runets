@@ -1,4 +1,4 @@
-// Per-frame CPU tables, ported from rune-fx `cpu.rs` (MIT, Anomaly): anything that is a 1D function of
+// Per-frame CPU tables, adapted from rune-fx `cpu.rs` (MIT, Anomaly): anything that is a 1D function of
 // (time, seed) or a particle list is evaluated once per frame here instead of once per pixel. The
 // integer hashes match the shaders bit for bit, so CPU and GPU noise agree.
 

@@ -1,5 +1,5 @@
-// Light-emitting effects ported from rune-fx (MIT, Anomaly): glow.wgsl, pulse.wgsl, electric.wgsl,
-// fire.wgsl (noise flames, plasma and embers; the GPU fluid simulation is not ported) and extras.wgsl.
+// Light-emitting effects adapted from rune-fx (MIT, Anomaly): glow.wgsl, pulse.wgsl, electric.wgsl,
+// fire.wgsl (noise flames, plasma and embers, with no GPU fluid simulation) and extras.wgsl.
 // Slot layouts are the originals'; see effects.ts for the packing.
 
 export const GLOW = /* glsl */ `

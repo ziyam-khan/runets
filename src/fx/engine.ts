@@ -1,5 +1,5 @@
-// The web runtime for the ported effects. Rune draws effect layers inside its own renderer; a page has
-// no such frame, so each effect gets a canvas beside its element. Small canvases share one WebGL 2
+// The web runtime for the effects. A page has no frame of its own to draw effect layers into, so each
+// effect gets a canvas beside its element. Small canvases share one WebGL 2
 // context (drawn there, then copied), so a page of demos never runs out of contexts; a big canvas (the
 // hero) can own its context and skip the copy. One clock for every layer. A canvas off screen, a hidden
 // tab or a settled layer under reduced motion draws nothing. On a software renderer (no GPU) every layer
@@ -142,7 +142,7 @@ class Engine {
     document.addEventListener('visibilitychange', () => this.wake())
     matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => { this.reduced = e.matches; for (const t of this.targets) t.dirty = true; this.wake() })
   }
-  /** Rune's one clock: time scale, pause and manual stepping, shared by every layer (and by headless checks). */
+  /** One clock: time scale, pause and manual stepping, shared by every layer (and by headless checks). */
   clock = { scale: 1, pinned: null as number | null }
   now() { return this.clock.pinned ?? ((performance.now() - this.start) / 1000) * this.clock.scale }
   /** Pin the clock at `t` seconds (null resumes); every layer redraws at that moment. */
