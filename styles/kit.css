@@ -449,6 +449,11 @@ textarea.k-input { height: auto; min-height: 88px; padding: 9px 11px; resize: ve
   .k-lineage-node > :is(a, div) { max-width: none; }
 }
 
+/* A page's own pause switch, data-motion="off" on the root: the kit's loops stop (effects rest too, in the engine).
+   Cursors stay solid instead of freezing mid-blink; spinners keep turning, since they say something is happening. */
+:root[data-motion="off"] .k-marquee[data-play] .k-marquee-track { animation-play-state: paused; }
+:root[data-motion="off"] :is(.k-smear, .k-term-caret, .k-unlock-label) { animation: none; }
+
 @media (prefers-reduced-motion: reduce) {
   .k-popup, .k-dialog, .k-toast, .k-tooltip { transition-property: opacity; }
   .k-popup[data-starting-style], .k-popup[data-ending-style], .k-dialog[data-starting-style], .k-dialog[data-ending-style] { transform: none; filter: none; }

@@ -2,7 +2,8 @@
 // effect gets a canvas beside its element. Small canvases share one WebGL 2
 // context (drawn there, then copied), so a page of demos never runs out of contexts; a big canvas (the
 // hero) can own its context and skip the copy. One clock for every layer. A canvas off screen, a hidden
-// tab or a settled layer under reduced motion draws nothing. On a software renderer (no GPU) every layer
+// tab or a settled layer under reduced motion draws nothing. `data-motion="off"` on the root element is a
+// page's own pause switch: while it is set, every layer rests on its reduced-motion pose. On a software renderer (no GPU) every layer
 // draws one still frame, as under reduced motion, so the page stays smooth.
 import { COMMON } from './glsl/common'
 import { GLOW, PULSE, ELECTRIC, FIRE, EXTRAS } from './glsl/emit'
@@ -140,13 +141,17 @@ class Engine {
   constructor() {
     if (typeof document === 'undefined') return
     document.addEventListener('visibilitychange', () => this.wake())
-    matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => { this.reduced = e.matches; for (const t of this.targets) t.dirty = true; this.wake() })
+    matchMedia('(prefers-reduced-motion: reduce)').addEventListener('change', e => { this.reduced = e.matches; this.redraw() })
+    new MutationObserver(() => this.redraw()).observe(document.documentElement, { attributes: true, attributeFilter: ['data-motion'] })
   }
+  /** The page switched motion off: `data-motion="off"` on the root. */
+  paused() { return document.documentElement.dataset.motion === 'off' }
+  redraw() { for (const t of this.targets) t.dirty = true; this.wake() }
   /** One clock: time scale, pause and manual stepping, shared by every layer (and by headless checks). */
   clock = { scale: 1, pinned: null as number | null }
   now() { return this.clock.pinned ?? ((performance.now() - this.start) / 1000) * this.clock.scale }
   /** Pin the clock at `t` seconds (null resumes); every layer redraws at that moment. */
-  pin(t: number | null) { this.clock.pinned = t; for (const x of this.targets) x.dirty = true; this.wake() }
+  pin(t: number | null) { this.clock.pinned = t; this.redraw() }
   sharedRenderer() {
     if (this.shared !== undefined) return this.shared
     const canvas = document.createElement('canvas')
@@ -173,8 +178,8 @@ class Engine {
     this.raf = 0
     if (document.hidden) return
     const time = this.now()
-    // No GPU: draw the reduced-motion still, the frame each effect is designed to rest on.
-    const still = this.reduced || this.slow
+    // No GPU, reduced motion or the page's pause: draw the still, the frame each effect is designed to rest on.
+    const still = this.reduced || this.slow || this.paused()
     let more = false
     for (const t of this.targets) {
       const live = t.animate && !still
