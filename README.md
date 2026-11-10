@@ -19,9 +19,10 @@ runets is my library of components, springs and WebGL 2 shader effects for React
 - shader effects in GLSL for WebGL 2: glow, pulse, electricity, fire, glass, liquid metal, dither and more;
 - weather (rain, snow, shooting stars, sandstorm, petal wind) and a light layer;
 - a component kit on accessible [Base UI](https://base-ui.com) primitives, with a lineage tree;
+- components a portfolio is made of: a retyping terminal with a smear cursor, a signpost, a bookshelf, a timeline, heat cards, an outline, a marquee and small toys;
 - spring tokens with exact physics.
 
-The live gallery, with a page per component and knobs for every parameter, is [My Components](https://ziyamkhan.com/my-components/) on ziyamkhan.com. That site is built with runets.
+The live gallery, with a page per component and knobs for every parameter, is [My Components](https://ziyamkhan.com/my-components/) on ziyamkhan.com. That site is built with runets. For coding agents, [ziyamkhan.com/my-components/llms.txt](https://ziyamkhan.com/my-components/llms.txt) has every component's import, usage, props and files in plain text.
 
 ## What's inside
 
@@ -33,6 +34,10 @@ The live gallery, with a page per component and knobs for every parameter, is [M
 | Weather | Rain (streaks, splashes, drops on the glass refracting the scene), Snow (four depths, bokeh, frost), Shooting stars, Sandstorm. `PetalWind`: sakura petals on a 2D canvas (no GPU), stirred by the pointer |
 | Light | A lamp above the page: soft shadows from raised elements, rim light on their bevels |
 | Kit | Button (ten variants, three sizes, five states), IconButton, Switch, Checkbox, RadioGroup, SegmentedControl, Badge, Keybind, Spinner, Loader, Progress, ProgressCircle, TextField, Select, Combobox, ShortcutRecorder, Menu, Popover, Tooltip, HoverCard, Dialog, Toast, Card, List, Accordion, Collapsible, Shell, Tree, Table, LineageTree (which work builds on which, with elbow wires) |
+| Text | `TerminalWindow` and `TerminalLines` (prompt lines that retype one word), `useRetype`, `SmearCursor` (a block cursor that smears from cell to cell), `WordSwap` (words taking turns in one place, in CSS), `Marquee` |
+| Navigation | `Signpost` (wooden signs on a picture, each a toggle), `Outline` (where you are in an article), `ScrollFade`, `NetworkMap` (a site map of visited pages) |
+| Content | `Bookshelf` (a book turns on its spine to show its cover, in CSS), `Timeline` (work and education), `HeatCard` (a card that warms while you look at it), `BadgeGroups`, `Testimonial`, `Spotlight`, `ArticleList`, `CopyButton`, `ShareMenu`, `BrandMenu`, `SpotlightMark`, `FilterKeys` with `ResultCount` |
+| Play | `ElasticSlider`, `SlideToUnlock`, `BrickBreaker` (a canvas game coloured by the theme), `useTap` (a click synthesised with WebAudio, no sound file) |
 
 ## Install
 
@@ -96,7 +101,7 @@ Every effect is data in `src/fx/effects.ts`: its defaults, its presets, a knob p
 
 ## Credits
 
-runets is inspired by [Rune](https://github.com/anomalyco/rune) by Anomaly (MIT). Many of its shader effects and presets, the kit's names and states and the motion tokens are adapted from Rune, so Rune's copyright notice is kept in [LICENSE](LICENSE), as the license requires. The weather effects, petal wind, the lineage tree, the light layer and the web runtime are runets' own.
+runets is inspired by [Rune](https://github.com/anomalyco/rune) by Anomaly (MIT). Many of its shader effects and presets, the kit's names and states and the motion tokens are adapted from Rune, so Rune's copyright notice is kept in [LICENSE](LICENSE), as the license requires. The weather effects, petal wind, the lineage tree, the light layer, the web runtime and every component in the Text, Navigation, Content and Play rows are runets' own.
 
 ## License
 

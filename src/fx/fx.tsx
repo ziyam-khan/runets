@@ -24,6 +24,8 @@ export type FxProps = {
   trigger?: number
   /** Raised elements inside the parent that cast shadows (Light). */
   occluders?: () => Occluder[]
+  /** Change it to redraw for the next second: something the layer reads, such as its occluders, moved on its own. */
+  wake?: number
   /** The lamp follows the pointer (Light). */
   followPointer?: boolean
   /** Weather: the scene's skyline, heights 0 (top) to 1 (bottom) across the image. */
@@ -38,10 +40,10 @@ export type FxProps = {
 }
 
 const ATTACK = 0.06, COOL = 0.55
-export function Fx({ effect, preset, params, place = 'under', radius, backdrop, mask, hot, trigger, occluders, followPointer, skyline, focus = [0.5, 0.5], shape, seed = 1, maxScale = 2, className }: FxProps) {
+export function Fx({ effect, preset, params, place = 'under', radius, backdrop, mask, hot, trigger, occluders, wake, followPointer, skyline, focus = [0.5, 0.5], shape, seed = 1, maxScale = 2, className }: FxProps) {
   const def = typeof effect === 'string' ? findEffect(effect) : effect
   const ref = useRef<HTMLCanvasElement>(null)
-  const live = useRef({ params: {} as Params, heat: { on: hot ?? true, at: -1e3, from: 1 }, t0: -1e3, pointer: undefined as [number, number] | undefined })
+  const live = useRef({ params: {} as Params, heat: { on: hot ?? true, at: -1e3, from: 1 }, t0: -1e3, woke: -1e3, pointer: undefined as [number, number] | undefined })
   const [box, setBox] = useState<{ w: number; h: number; r: number; m: [number, number, number, number]; s: number } | null>(null)
   const p = def ? paramsOf(def, preset, params) : {}
   live.current.params = p
@@ -71,6 +73,9 @@ export function Fx({ effect, preset, params, place = 'under', radius, backdrop, 
     live.current.heat = { on: hot ?? true, at: now, from: cur }
     e.wake()
   }, [hot])
+
+  // A wake redraws for a second, even where the layer otherwise rests on one still frame (no GPU).
+  useEffect(() => { if (wake) { const e = fxEngine(); live.current.woke = e.now(); e.wake() } }, [wake])
 
   // One-shots start now.
   useEffect(() => { if (trigger) { const e = fxEngine(); live.current.t0 = e.now(); e.wake() } }, [trigger])
@@ -102,6 +107,7 @@ export function Fx({ effect, preset, params, place = 'under', radius, backdrop, 
     const settles = trigger !== undefined || (hot !== undefined && def.id === 'glow' && !live.current.params.breathe && live.current.params.style !== 'aura')
     if (def.still?.(live.current.params)) target.animate = false
     if (settles) { target.animate = false; Object.defineProperty(target, 'until', { get: () => Math.max(live.current.t0 + 2.6, live.current.heat.at + 4) }) }
+    else if (wake !== undefined) Object.defineProperty(target, 'until', { get: () => live.current.woke + 1 })
     if (mask) { const c = paintCanvas(mask, box.w, box.h, box.s); target.source = { source: c, version: Date.now() } }
     if (typeof backdrop === 'function') {
       const c = paintCanvas(ctx => { ctx.translate(l * box.s, t * box.s); ctx.scale(box.s, box.s); backdrop(ctx, box.w, box.h) }, box.w + l + r, box.h + t + b, 1, box.s)
@@ -119,7 +125,7 @@ export function Fx({ effect, preset, params, place = 'under', radius, backdrop, 
     const move = (ev: PointerEvent) => { const rr = host!.getBoundingClientRect(); live.current.pointer = [ev.clientX - rr.left, ev.clientY - rr.top]; target.dirty = true; e.wake() }
     if (followPointer && host) host.addEventListener('pointermove', move)
     return () => { disposed = true; remove(); remove = () => {}; if (followPointer && host) host.removeEventListener('pointermove', move) }
-  }, [box, def, key, mask, backdrop, hot === undefined, trigger === undefined, followPointer, occluders, seed, skyline, focus[0], focus[1], shape])
+  }, [box, def, key, mask, backdrop, hot === undefined, trigger === undefined, wake === undefined, followPointer, occluders, seed, skyline, focus[0], focus[1], shape])
 
   if (!def) return null
   const [l, t, r, b] = box?.m ?? [0, 0, 0, 0]

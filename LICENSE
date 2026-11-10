@@ -2,9 +2,9 @@ MIT License
 
 Copyright (c) 2026 Ziyam Khan
 
-runets is a TypeScript port of Rune (https://github.com/anomalyco/rune): its shaders, CPU tables,
-parameters and presets, components and motion tokens are translated from Rune's source, which is
-distributed under the following license:
+runets is written in TypeScript by Ziyam Khan, inspired by Rune (https://github.com/anomalyco/rune).
+Several of its effect shaders, their presets and the motion tokens were written from Rune's in TypeScript
+and GLSL, so Rune's license is kept here, as it requires:
 
   Copyright (c) 2026 Anomaly
 
@@ -25,3 +25,4 @@ AUTHORS OR COPYRIGHT HOLDERS BE LIABLE FOR ANY CLAIM, DAMAGES OR OTHER
 LIABILITY, WHETHER IN AN ACTION OF CONTRACT, TORT OR OTHERWISE, ARISING FROM,
 OUT OF OR IN CONNECTION WITH THE SOFTWARE OR THE USE OR OTHER DEALINGS IN THE
 SOFTWARE.
+
