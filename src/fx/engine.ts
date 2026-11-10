@@ -2,12 +2,14 @@
 // no such frame, so each effect gets a canvas beside its element. Small canvases share one WebGL 2
 // context (drawn there, then copied), so a page of demos never runs out of contexts; a big canvas (the
 // hero) can own its context and skip the copy. One clock for every layer. A canvas off screen, a hidden
-// tab or a settled layer under reduced motion draws nothing.
+// tab or a settled layer under reduced motion draws nothing. On a software renderer (no GPU) every layer
+// draws one still frame, as under reduced motion, so the page stays smooth.
 import { COMMON } from './glsl/common'
 import { GLOW, PULSE, ELECTRIC, FIRE, EXTRAS } from './glsl/emit'
 import { DISTORT, FILL } from './glsl/surface'
 import { WEATHER, LIGHT } from './glsl/weather'
 import type { EffectDef, Family, Frame, Params } from './effects'
+import { isSoftware, rendererName } from './gpu'
 
 const SOURCES: Record<Family, string> = { glow: GLOW, pulse: PULSE, electric: ELECTRIC, fire: FIRE, extras: EXTRAS, distort: DISTORT, fill: FILL, weather: WEATHER, light: LIGHT }
 const VERT = '#version 300 es\nvoid main() { vec2 p = vec2(float(gl_VertexID & 1), float(gl_VertexID >> 1)); gl_Position = vec4(p * 2.0 - 1.0, 0.0, 1.0); }'
@@ -133,6 +135,8 @@ class Engine {
   raf = 0
   observer: IntersectionObserver | null = typeof IntersectionObserver === 'function' ? new IntersectionObserver(entries => { for (const e of entries) { const t = [...this.targets].find(x => x.canvas === e.target); if (t) { t.visible = e.isIntersecting; t.dirty = true } } this.wake() }, { rootMargin: '120px' }) : null
   reduced = reducedQuery()
+  /** True when WebGL runs on the CPU: layers then draw once and never loop. */
+  slow = false
   constructor() {
     if (typeof document === 'undefined') return
     document.addEventListener('visibilitychange', () => this.wake())
@@ -148,14 +152,18 @@ class Engine {
     const canvas = document.createElement('canvas')
     const gl = canvas.getContext('webgl2', { premultipliedAlpha: true, alpha: true, antialias: false, preserveDrawingBuffer: false })
     this.shared = gl ? { canvas, renderer: new Renderer(gl) } : null
+    if (gl) this.check(gl)
     return this.shared
   }
+  /** A software renderer sets `slow`, and `data-gpu="none"` on the root so the page's CSS can drop its blurs too. */
+  check(gl: WebGL2RenderingContext) { if (!this.slow && isSoftware(rendererName(gl))) { this.slow = true; document.documentElement.dataset.gpu = 'none' } }
   /** True when this browser can draw the effects at all. */
   supported() { return !!this.sharedRenderer() }
   add(t: Target) {
     t.visible ??= true; t.dirty = true
+    this.sharedRenderer() // knows `slow` before the first frame
     this.targets.add(t)
-    if (t.dedicated) { const gl = t.canvas.getContext('webgl2', { premultipliedAlpha: true, alpha: true, antialias: false }); this.own.set(t, gl ? new Renderer(gl) : null) }
+    if (t.dedicated) { const gl = t.canvas.getContext('webgl2', { premultipliedAlpha: true, alpha: true, antialias: false }); this.own.set(t, gl ? new Renderer(gl) : null); if (gl) this.check(gl) }
     this.observer?.observe(t.canvas)
     this.wake()
     return () => { this.targets.delete(t); this.own.delete(t); this.observer?.unobserve(t.canvas) }
@@ -165,21 +173,23 @@ class Engine {
     this.raf = 0
     if (document.hidden) return
     const time = this.now()
+    // No GPU: draw the reduced-motion still, the frame each effect is designed to rest on.
+    const still = this.reduced || this.slow
     let more = false
     for (const t of this.targets) {
-      const live = t.animate && !this.reduced
+      const live = t.animate && !still
       const due = t.visible && (t.dirty || (live && this.clock.pinned === null) || (t.until !== undefined && time < t.until && this.clock.pinned === null))
       if (!due) continue
       t.dirty = false
       const w = t.canvas.width, h = t.canvas.height
       if (!w || !h) continue
       const own = this.own.get(t)
-      if (t.dedicated) { if (own) own.draw(t, w, h, time, this.reduced) }
+      if (t.dedicated) { if (own) own.draw(t, w, h, time, still) }
       else {
         const s = this.sharedRenderer()
         if (!s) continue
         if (s.canvas.width < w || s.canvas.height < h) { s.canvas.width = Math.min(4096, Math.max(s.canvas.width, Math.ceil(w / 256) * 256)); s.canvas.height = Math.min(4096, Math.max(s.canvas.height, Math.ceil(h / 256) * 256)) }
-        s.renderer.draw(t, w, h, time, this.reduced)
+        s.renderer.draw(t, w, h, time, still)
         const ctx = t.canvas.getContext('2d')
         if (ctx) { ctx.clearRect(0, 0, w, h); ctx.drawImage(s.canvas, 0, s.canvas.height - h, w, h, 0, 0, w, h) }
       }
@@ -192,6 +202,6 @@ class Engine {
 let engine: Engine | null = null
 /** The page's one effects engine (created on first use, in the browser only). Exposed as `window.runetsClock` for headless checks. */
 export const fxEngine = () => {
-  if (!engine) { engine = new Engine(); if (typeof window !== 'undefined') (window as unknown as { runetsClock: unknown }).runetsClock = { pin: (t: number | null) => engine!.pin(t), now: () => engine!.now() } }
+  if (!engine) { engine = new Engine(); if (typeof window !== 'undefined') (window as unknown as { runetsClock: unknown }).runetsClock = { pin: (t: number | null) => engine!.pin(t), now: () => engine!.now(), slow: () => engine!.slow } }
   return engine
 }

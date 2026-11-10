@@ -84,6 +84,7 @@ Every effect is data in `src/fx/effects.ts`: its defaults, Rune's presets, a kno
 - **One engine, one clock.** Small canvases share one WebGL 2 context: each draws there, then is copied, so a page of fifty live effects never runs out of contexts. A full-screen canvas can own its context. One clock drives every layer. It can be pinned (`window.runetsClock.pin(t)`) for screenshots and tests, as Rune's headless renders are.
 - **Deterministic.** Each frame is a pure function of pixel, time and seed. The hashes are integer PCG on the GPU and in TypeScript alike, so CPU tables and shaders agree.
 - **Quiet when nothing changes.** A canvas off screen, a hidden tab, a settled one-shot or a heated glow at rest draws nothing. Under `prefers-reduced-motion`, every loop settles on one calm pose and one-shots fade in place.
+- **Still without a GPU.** When WebGL runs on the CPU (SwiftShader, llvmpipe, Microsoft Basic Render Driver), every effect draws that same calm pose once and stops, and the root gets `data-gpu="none"` so your CSS can drop its blurs too. Only those renderer names count, so a real GPU, however old, keeps the motion.
 - **What differs from Rune.**
   - The backdrop that glass and distortion read is an image or a painted canvas you hand the layer: a page cannot sample the frame behind an element. Its mip chain stands in for Rune's blur pyramid.
   - Light beyond coverage becomes coverage of its own hue, because a canvas cannot add light. Over dark UI this matches an additive blend.
