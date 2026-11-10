@@ -30,9 +30,9 @@ It also adds four weather effects and a light layer written in the same manner. 
 | Motion | `instant`, `snap`, `settle`, `reflow`, `glide`, `morph`, `pop` and `drift` springs, as enter and exit pairs (duration and bounce, SwiftUI's parameterisation: ω = 2π / duration, ζ = 1 − bounce). Also `blurReplace` presence, `RollingText` and `MotionBlur` |
 | Effects | Glow (soft, neon that cools, aura, mask), Pulse (radar, breathe, heartbeat, ping, ripple), Electricity (arc, border, charged), Fire (flames with embers, plasma, heat), Heat haze, Shockwave, Liquid glass, CRT, Chromatic split, Shimmer, Sparkles, Aurora, Grain |
 | Fills | Liquid metal, Mesh gradient, Dither (Bayer, blue noise, white), Grain gradient, Fluted glass, Metaballs, Swirl, Voronoi, Waves, Halftone, Plastic, each with Rune's presets |
-| Weather | Rain (streaks, splashes, drops on the glass refracting the scene), Snow (four depths, bokeh, frost), Shooting stars, Sandstorm |
+| Weather | Rain (streaks, splashes, drops on the glass refracting the scene), Snow (four depths, bokeh, frost), Shooting stars, Sandstorm. `PetalWind`: sakura petals on a 2D canvas (no GPU), stirred by the pointer |
 | Light | A lamp above the page: soft shadows from raised elements, rim light on their bevels |
-| Kit | Button (ten variants, three sizes, five states), IconButton, Switch, Checkbox, RadioGroup, SegmentedControl, Badge, Keybind, Spinner, Loader, Progress, ProgressCircle, TextField, Select, Combobox, ShortcutRecorder, Menu, Popover, Tooltip, HoverCard, Dialog, Toast, Card, List, Accordion, Collapsible, Shell, Tree, Table |
+| Kit | Button (ten variants, three sizes, five states), IconButton, Switch, Checkbox, RadioGroup, SegmentedControl, Badge, Keybind, Spinner, Loader, Progress, ProgressCircle, TextField, Select, Combobox, ShortcutRecorder, Menu, Popover, Tooltip, HoverCard, Dialog, Toast, Card, List, Accordion, Collapsible, Shell, Tree, Table, LineageTree (which work builds on which, with elbow wires) |
 
 ## Install
 
@@ -95,7 +95,7 @@ Every effect is data in `src/fx/effects.ts`: its defaults, Rune's presets, a kno
 
 ## Credits
 
-The effects, their presets, the kit's names and states and the motion tokens come from [Rune](https://github.com/anomalyco/rune) by Anomaly, under the MIT license. Its copyright notice is kept in [LICENSE](LICENSE), as the license requires. The weather effects, the light layer and the web runtime are new.
+The effects, their presets, the kit's names and states and the motion tokens come from [Rune](https://github.com/anomalyco/rune) by Anomaly, under the MIT license. Its copyright notice is kept in [LICENSE](LICENSE), as the license requires. The weather effects, the light layer, petal wind, the lineage tree and the web runtime are new.
 
 ## License
 
