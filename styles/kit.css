@@ -355,12 +355,38 @@ textarea.k-input { height: auto; min-height: 88px; padding: 9px 11px; resize: ve
 
 /* Badge groups: labelled wraps of badges in a panel; the groups flow into as many columns as fit. */
 .k-badge-groups { padding: 24px; border-radius: var(--k-r-lg); background: var(--k-surface); }
-.k-badge-groups-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
-.k-badge-groups-head > * { margin: 0; }
-.k-badge-groups-head p { color: var(--k-muted); font-size: var(--text-sm, .875rem); }
+.k-badge-groups-head, .k-cg-head { display: flex; flex-wrap: wrap; align-items: baseline; justify-content: space-between; gap: 4px 24px; }
+:is(.k-badge-groups-head, .k-cg-head) > * { margin: 0; }
+:is(.k-badge-groups-head, .k-cg-head) p { color: var(--k-muted); font-size: var(--text-sm, .875rem); }
 .k-badge-groups-body { display: grid; grid-template-columns: repeat(auto-fit, minmax(min(100%, 11rem), 1fr)); gap: 24px; margin-top: 24px; }
 .k-badge-groups-label { display: flex; align-items: center; gap: 8px; margin: 0 0 12px; font: 500 12px/1.3 var(--font-mono, ui-monospace, monospace); letter-spacing: .1em; text-transform: uppercase; color: var(--k-muted); }
 .k-badge-groups ul { list-style: none; margin: 0; padding: 0; display: flex; flex-wrap: wrap; gap: 8px; }
+
+/* Contribution graph: a square per day in five levels, --k-cg-0 (none) to --k-cg-4 (the busiest quarter). The scroll
+   box runs right to left, so on a narrow screen it opens on the latest weeks with no script; the SVG inside fills
+   the width when there is room. The tip sits over the day it names. */
+.k-cg { --k-cg-0: var(--k-fill-press); --k-cg-1: color-mix(in oklab, var(--k-accent) 35%, var(--k-cg-0)); --k-cg-2: color-mix(in oklab, var(--k-accent) 60%, var(--k-cg-0)); --k-cg-3: color-mix(in oklab, var(--k-accent) 80%, var(--k-cg-0)); --k-cg-4: var(--k-accent);
+  padding: 24px; border-radius: var(--k-r-lg); background: var(--k-surface); }
+.k-cg figure { position: relative; margin: 16px 0 0; }
+.k-cg-head + figure { margin-top: 24px; }
+.k-cg-scroll { overflow-x: auto; direction: rtl; scrollbar-width: thin; }
+.k-cg-scroll:focus-visible { outline: 2px solid var(--color-focus); outline-offset: 4px; }
+.k-cg svg { display: block; width: 100%; height: auto; direction: ltr; }
+.k-cg text { fill: var(--k-muted); font: 9px var(--font-mono, ui-monospace, monospace); }
+.k-cg [data-l="0"] { fill: var(--k-cg-0); background: var(--k-cg-0); }
+.k-cg [data-l="1"] { fill: var(--k-cg-1); background: var(--k-cg-1); }
+.k-cg [data-l="2"] { fill: var(--k-cg-2); background: var(--k-cg-2); }
+.k-cg [data-l="3"] { fill: var(--k-cg-3); background: var(--k-cg-3); }
+.k-cg [data-l="4"] { fill: var(--k-cg-4); background: var(--k-cg-4); }
+.k-cg rect[data-on] { stroke: var(--k-ink); stroke-width: 1.5; }
+.k-cg-foot { display: flex; flex-wrap: wrap; align-items: center; justify-content: space-between; gap: 8px 24px; margin-top: 12px; color: var(--k-muted); font-size: var(--text-sm, .875rem); }
+.k-cg-foot a { color: var(--k-ink); }
+.k-cg-legend { display: inline-flex; align-items: center; gap: 4px; font-size: var(--text-xs, .75rem); }
+.k-cg-legend i { width: 11px; height: 11px; border-radius: 2px; }
+.k-cg-legend i:first-child { margin-left: 4px; }
+.k-cg-legend i:last-child { margin-right: 4px; }
+.k-cg-tip { position: absolute; left: 0; top: 0; z-index: 1; translate: -50% calc(-100% - 6px); padding: 6px 9px; border-radius: 7px; background: var(--foreground); color: var(--background); font-size: var(--text-xs); white-space: nowrap; box-shadow: var(--k-shadow); pointer-events: none; opacity: 0; transition: opacity var(--dur-snap) var(--ease-spring); }
+.k-cg-tip[data-open] { opacity: 1; }
 
 /* Signpost: wooden signs on a picture. Colours: --sign-wood/-2 (arrows), --board-wood/-2 (boards), --brass, --sign-ink.
    Each sign is placed by --x and --y in percent; the board's band of light waits off its left edge until a sheen. */
